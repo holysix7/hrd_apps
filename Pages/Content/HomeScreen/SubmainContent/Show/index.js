@@ -3,11 +3,11 @@ import React, {useState, useEffect, useCallback } from 'react'
 import { Container, Text, Button} from 'native-base'
 import Axios from 'axios'
 import AsyncStorage from "@react-native-community/async-storage"
-import Xdua from '../Assets/Xdua.png'
-import approved_biru from '../Assets/approved.png'
+import Xdua from '../../../../Assets/Xdua.png'
+import approved_biru from '../../../../Assets/approved.png'
 import moment from 'moment'
-import base_url from '../System/base_url'
-import app_version from '../System/app_version'
+import base_url from '../../../../System/base_url'
+import app_version from '../../../../System/app_version'
 
 const ShowViolation = ({route, navigation}) => {
   const {user_id, id, sys_plant_id, violator_id, violator_name, violator_nik, violation_time, violation_date, violation_status, violation_status_case, approve_1_by, approve_2_by, approve_3_by, enforcer_id, enforcer_name, enforcer_nik, whitness_id, whitness_name, whitness_nik, description, penalty_first_name, penalty_description, penalty_second_name, penalty_description_second, start_date, end_date} = route.params

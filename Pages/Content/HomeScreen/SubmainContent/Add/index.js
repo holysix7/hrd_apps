@@ -4,13 +4,13 @@ import { Container, Text, Button} from 'native-base'
 import Axios from 'axios'
 import AsyncStorage from "@react-native-community/async-storage"
 import { Picker } from '@react-native-picker/picker'
-import cameraIcons from '../Assets/cameraicon.png'
+import cameraIcons from '../../../../Assets/cameraicon.png'
 import moment from 'moment'
 import Autocomplete from 'react-native-autocomplete-input'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import {launchCamera} from 'react-native-image-picker';
-import base_url from '../System/base_url'
-import app_version from '../System/app_version'
+import base_url from '../../../../System/base_url'
+import app_version from '../../../../System/app_version'
 
 const AddViolation = ({route, navigation}) => {
   const {sys_plant_id, id, name, nik} = route.params
@@ -72,7 +72,7 @@ const AddViolation = ({route, navigation}) => {
       'Content-Type': 'application/x-www-form-urlencoded', 
       'Cookie': '__profilin=p%3Dt'
     }
-		Axios.get(`${base_url}/api/v2/hrds/new?`, {params: params, headers: headers})
+		Axios.get(`http://192.168.131.121:3000/api/v2/hrds/new?`, {params: params, headers: headers})
 		.then(response => {
       setCode(response.data.code)
 			setData(response.data.data)
@@ -113,8 +113,7 @@ const AddViolation = ({route, navigation}) => {
     }
 		var config = {
 			method: 'post',
-      // url: `${base_url}/api/v2/hrds`,
-      url: `http://192.168.131.121:3000/api/v2/hrds`,
+      url: `${base_url}/api/v2/hrds`,
 			headers: { 
 				'Authorization': `${token}`, 
 				'Content-Type': 'application/json', 
@@ -315,7 +314,8 @@ const AddViolation = ({route, navigation}) => {
       'Content-Type': 'application/x-www-form-urlencoded', 
       'Cookie': '__profilin=p%3Dt'
     }
-		Axios.get(`${base_url}/api/v2/hrds?`, {params: params, headers: headers})
+		Axios.get(`http://192.168.131.121:3000/api/v2/hrds?`, {params: params, headers: headers})
+		// Axios.get(`${base_url}/api/v2/hrds?`, {params: params, headers: headers})
 		.then(response => {
 			getKaryawan(response.data.data != null ? response.data.data : null)
 			setLoading(true)
@@ -362,7 +362,8 @@ const AddViolation = ({route, navigation}) => {
       'Content-Type': 'application/x-www-form-urlencoded', 
       'Cookie': '__profilin=p%3Dt'
     }
-		Axios.get(`${base_url}/api/v2/hrds?`, {params: params, headers: headers})
+		Axios.get(`http://192.168.131.121:3000/api/v2/hrds?`, {params: params, headers: headers})
+		// Axios.get(`${base_url}/api/v2/hrds?`, {params: params, headers: headers})
 		.then(response => {
 			getKaryawanDua(response.data.data != null ? response.data.data : null)
 			setLoading(true)
@@ -502,186 +503,197 @@ const AddViolation = ({route, navigation}) => {
   }
 
   const content = () => {
-    return (
-      <ScrollView>
- 
-        <View style={{borderBottomWidth: 0.5}}>
-          <View style={{height: 40, justifyContent: 'center', paddingLeft: 10}}>
-            <Text>Pelapor :</Text>
-          </View>
-          <View style={{paddingHorizontal: 10, paddingTop: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
-            <View style={{marginLeft: 15, paddingLeft: 5, borderWidth: 0.5, borderRadius: 5, width: '70%', height: 40, justifyContent: 'center', backgroundColor: '#b8b8b8'}}>
-              <Text>{name != null ? name : '-'}</Text>
-            </View>
-          </View>
-          <View style={{padding: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
-            <View style={{marginLeft: 15, paddingLeft: 5, backgroundColor: '#b8b8b8', borderWidth: 0.5, borderRadius: 5, width: '70%', height: 40, justifyContent: 'center'}}>
-              <Text>{nik != null ? nik : "-"}</Text>
-            </View>
-          </View>
-          
-          <View style={{flexDirection: 'row', marginBottom: 5, justifyContent: 'flex-end', width: '100%'}}>
-            <View style={{flexDirection: 'row', width: '70%', justifyContent: 'flex-end'}}>
-              <View style={{borderWidth: 0.5, borderRadius: 5, height: 40, justifyContent: 'center', width: '68%', alignItems:'flex-end', paddingRight: 10}}>
-                <Text onPress={() => showDate()}>{violationDateText != null ? violationDateText : "Pilih"}</Text>
+    console.log(code)
+    if(code != null){
+      if(code != 403){
+        return (
+          <ScrollView>
+     
+            <View style={{borderBottomWidth: 0.5}}>
+              <View style={{height: 40, justifyContent: 'center', paddingLeft: 10}}>
+                <Text>Pelapor :</Text>
               </View>
-              {showDateModal()}
-              <View style={{marginLeft: 5, borderWidth: 0.5, borderRadius: 5, marginRight: 10, height: 40, width: '25%', justifyContent: 'center', alignItems:'flex-end', paddingRight: 10}}>
-                <Text onPress={() => showTimeFunction()}>{violationTimeText != null ? violationTimeText : '-'}</Text>
-                {/* <TextInput style={{color: 'black'}} keyboardType={"numeric"} value={violation_time} onChangeText={(time) => setViolationTime(time)} /> */}
+              <View style={{paddingHorizontal: 10, paddingTop: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
+                <View style={{marginLeft: 15, paddingLeft: 5, borderWidth: 0.5, borderRadius: 5, width: '70%', height: 40, justifyContent: 'center', backgroundColor: '#b8b8b8'}}>
+                  <Text>{name != null ? name : '-'}</Text>
+                </View>
               </View>
-              {showTimeModal()}
+              <View style={{padding: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
+                <View style={{marginLeft: 15, paddingLeft: 5, backgroundColor: '#b8b8b8', borderWidth: 0.5, borderRadius: 5, width: '70%', height: 40, justifyContent: 'center'}}>
+                  <Text>{nik != null ? nik : "-"}</Text>
+                </View>
+              </View>
+              
+              <View style={{flexDirection: 'row', marginBottom: 5, justifyContent: 'flex-end', width: '100%'}}>
+                <View style={{flexDirection: 'row', width: '70%', justifyContent: 'flex-end'}}>
+                  <View style={{borderWidth: 0.5, borderRadius: 5, height: 40, justifyContent: 'center', width: '68%', alignItems:'flex-end', paddingRight: 10}}>
+                    <Text onPress={() => showDate()}>{violationDateText != null ? violationDateText : "Pilih"}</Text>
+                  </View>
+                  {showDateModal()}
+                  <View style={{marginLeft: 5, borderWidth: 0.5, borderRadius: 5, marginRight: 10, height: 40, width: '25%', justifyContent: 'center', alignItems:'flex-end', paddingRight: 10}}>
+                    <Text onPress={() => showTimeFunction()}>{violationTimeText != null ? violationTimeText : '-'}</Text>
+                    {/* <TextInput style={{color: 'black'}} keyboardType={"numeric"} value={violation_time} onChangeText={(time) => setViolationTime(time)} /> */}
+                  </View>
+                  {showTimeModal()}
+                </View>
+              </View>
             </View>
-          </View>
-        </View>
-        
-        <View style={{borderBottomWidth: 0.5}}>
-          <View style={{height: 40, justifyContent: 'center', paddingLeft: 10}}>
-            <Text>Saksi :</Text>
-          </View>
-          <View style={{paddingHorizontal: 10, paddingTop: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
-            <View style={{marginLeft: 15, paddingLeft: 5, borderWidth: 0.5, borderRadius: 5, width: '70%', height: 40, justifyContent: 'center'}}>
-              <Picker 
-                selectedValue={whitnessDeptId}
-                style={{ height: 40, width: 400, color: 'black' }}
-                itemStyle={{height: 20}}
-                onValueChange={(itemValue, itemIndex) => getDept(itemValue, "Whitness")}
-              >
-                {GetSysDept()}
-              </Picker>
+            
+            <View style={{borderBottomWidth: 0.5}}>
+              <View style={{height: 40, justifyContent: 'center', paddingLeft: 10}}>
+                <Text>Saksi :</Text>
+              </View>
+              <View style={{paddingHorizontal: 10, paddingTop: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
+                <View style={{marginLeft: 15, paddingLeft: 5, borderWidth: 0.5, borderRadius: 5, width: '70%', height: 40, justifyContent: 'center'}}>
+                  <Picker 
+                    selectedValue={whitnessDeptId}
+                    style={{ height: 40, width: 400, color: 'black' }}
+                    itemStyle={{height: 20}}
+                    onValueChange={(itemValue, itemIndex) => getDept(itemValue, "Whitness")}
+                  >
+                    {GetSysDept()}
+                  </Picker>
+                </View>
+              </View>
+              <View style={{paddingHorizontal: 10, paddingTop: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
+                <View style={{marginLeft: 15, paddingLeft: 5, borderWidth: 0.5, borderRadius: 5, width: '70%', height: 40, justifyContent: 'center'}}>
+                  <Picker 
+                    selectedValue={whitness_id}
+                    style={{ height: 40, width: 400, color: 'black' }}
+                    itemStyle={{height: 20}}
+                    onValueChange={(itemValue, itemIndex) => getNik(itemValue, "Whitness")}
+                  >
+                    {functionKaryawan()}
+                  </Picker>
+                </View>
+              </View>
+              <View style={{padding: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
+                <View style={{marginLeft: 15, paddingLeft: 5, backgroundColor: '#b8b8b8', borderWidth: 0.5, borderRadius: 5, width: '70%', height: 40, justifyContent: 'center'}}>
+                  <Text>{whitness_nik != null ? whitness_nik : "-"}</Text>
+                </View>
+              </View>
             </View>
-          </View>
-          <View style={{paddingHorizontal: 10, paddingTop: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
-            <View style={{marginLeft: 15, paddingLeft: 5, borderWidth: 0.5, borderRadius: 5, width: '70%', height: 40, justifyContent: 'center'}}>
-              <Picker 
-                selectedValue={whitness_id}
-                style={{ height: 40, width: 400, color: 'black' }}
-                itemStyle={{height: 20}}
-                onValueChange={(itemValue, itemIndex) => getNik(itemValue, "Whitness")}
-              >
-                {functionKaryawan()}
-              </Picker>
-            </View>
-          </View>
-          <View style={{padding: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
-            <View style={{marginLeft: 15, paddingLeft: 5, backgroundColor: '#b8b8b8', borderWidth: 0.5, borderRadius: 5, width: '70%', height: 40, justifyContent: 'center'}}>
-              <Text>{whitness_nik != null ? whitness_nik : "-"}</Text>
-            </View>
-          </View>
-        </View>
- 
-        <View style={{borderBottomWidth: 0.5}}>
-          <View style={{height: 40, justifyContent: 'center', paddingLeft: 10}}>
-            <Text>Pelanggar :</Text>
-          </View>
-      
-          <View style={{paddingHorizontal: 10, paddingTop: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
-            <View style={{marginLeft: 15, paddingLeft: 5, borderWidth: 0.5, borderRadius: 5, width: '70%', height: 40, justifyContent: 'center'}}>
-              <Picker 
-                selectedValue={violatorDeptId}
-                style={{ height: 40, width: 400, color: 'black' }}
-                itemStyle={{height: 20}}
-                onValueChange={(itemValue, itemIndex) => getDeptDua(itemValue, "Violator")}
-              >
-                {GetSysDeptDua()}
-              </Picker>
-            </View>
-          </View>
-      
-          <View style={{paddingHorizontal: 10, paddingTop: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
-            <View style={{marginLeft: 15, paddingLeft: 5, borderWidth: 0.5, borderRadius: 5, width: '70%', height: 40, justifyContent: 'center'}}>
-              <Picker 
-                selectedValue={violator_id}
-                style={{ height: 40, width: 400, color: 'black' }}
-                itemStyle={{height: 20}}
-                onValueChange={(itemValue, itemIndex) => getNikDua(itemValue, "Violator")}
-              >
-                {functionKaryawanDua()}
-              </Picker>
-            </View>
-          </View>
-        
-          <View style={{padding: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
-            <View style={{marginLeft: 15, paddingLeft: 5, backgroundColor: '#b8b8b8', borderWidth: 0.5, borderRadius: 5, width: '70%', height: 40, justifyContent: 'center'}}>
-              <Text>{violator_nik != null ? violator_nik : '-'}</Text>
-            </View>
-          </View>
+     
+            <View style={{borderBottomWidth: 0.5}}>
+              <View style={{height: 40, justifyContent: 'center', paddingLeft: 10}}>
+                <Text>Pelanggar :</Text>
+              </View>
           
-          <View style={{height: 40, justifyContent: 'center', paddingLeft: 10}}>
-            <Text>Deskripsi :</Text>
-          </View>
-      
-          <View style={{padding: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
-            <View style={{marginLeft: 15, paddingLeft: 5, borderWidth: 0.5, borderRadius: 5, width: '70%', height: 80, justifyContent: 'center'}}>
-              <TextInput value={description} multiline onChangeText={(value) => setDescription(value)} style={{color: 'black'}} placeholder="Deskripsi" placeholderTextColor="grey" />
-            </View>
-          </View>
-
-        </View>
-
-        <View style={{borderBottomWidth: 0.5}}>
-          <View style={{height: 40, justifyContent: 'center', paddingLeft: 10}}>
-            <Text>Hukuman 1 :</Text>
-          </View>
-      
-          <View style={{paddingHorizontal: 10, paddingTop: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
-            <View style={{marginLeft: 15, paddingLeft: 5, borderWidth: 0.5, borderRadius: 5, width: '70%', height: 40, justifyContent: 'center'}}>
-              <Picker 
-                selectedValue={penalty_first_id}
-                style={{ height: 40, width: 400, color: 'black' }}
-                itemStyle={{height: 20}}
-                onValueChange={(itemValue, itemIndex) => setPenaltiesFunc(itemValue, "First")}
-              >
-                {childPenalties()}
-              </Picker>
-            </View>
-          </View>
-          <View style={{padding: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
-            <View style={{marginLeft: 15, paddingLeft: 5, borderWidth: 0.5, borderRadius: 5, width: '70%', height: 80, justifyContent: 'center'}}>
-              <TextInput value={penalty_description} multiline onChangeText={(value) => setPenaltyFirstDescription(value)} style={{color: 'black'}} placeholder="Pelanggaran Deskripsi 1" placeholderTextColor="grey" />
-            </View>
-          </View>
-        </View>
-
-        <View style={{borderBottomWidth: 0.5}}>
-          <View style={{height: 40, justifyContent: 'center', paddingLeft: 10}}>
-            <Text>Hukuman 2 :</Text>
-          </View>
-      
-          <View style={{paddingHorizontal: 10, paddingTop: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
-            <View style={{marginLeft: 15, paddingLeft: 5, borderWidth: 0.5, borderRadius: 5, width: '70%', height: 40, justifyContent: 'center'}}>
-              <Picker 
-                selectedValue={penalty_second_id}
-                style={{ height: 40, width: 400, color: 'black' }}
-                itemStyle={{height: 20}}
-                onValueChange={(itemValue, itemIndex) => setPenaltiesFunc(itemValue, "Second")}
-              >
-                {childPenalties()}
-              </Picker>
-            </View>
-          </View>
-          <View style={{padding: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
-            <View style={{marginLeft: 15, paddingLeft: 5, borderWidth: 0.5, borderRadius: 5, width: '70%', height: 80, justifyContent: 'center'}}>
-              <TextInput value={penalty_description_second} multiline onChangeText={(value) => setPenaltySecondDescription(value)} style={{color: 'black'}} placeholder="Pelanggaran Deskripsi 2" placeholderTextColor="grey" />
-            </View>
-          </View>
-        </View>
+              <View style={{paddingHorizontal: 10, paddingTop: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
+                <View style={{marginLeft: 15, paddingLeft: 5, borderWidth: 0.5, borderRadius: 5, width: '70%', height: 40, justifyContent: 'center'}}>
+                  <Picker 
+                    selectedValue={violatorDeptId}
+                    style={{ height: 40, width: 400, color: 'black' }}
+                    itemStyle={{height: 20}}
+                    onValueChange={(itemValue, itemIndex) => getDeptDua(itemValue, "Violator")}
+                  >
+                    {GetSysDeptDua()}
+                  </Picker>
+                </View>
+              </View>
           
-
-        {buttonImageTrigger()}
-
-        {/* <View style={{marginTop: 20, flexDirection: 'row', height: 300, borderWidth: 0.3, justifyContent: 'center', alignItems: 'center'}}>
-          <View style={{justifyContent: 'center', alignItems: 'center', width: '50%', height: 300}}> */}
-            {imageContent()}
-
-          {/* </View>
-        </View> */}
-
-        <View style={{padding: 10, flexDirection: 'row', flex: 1, justifyContent: 'center'}}>
-          {functionButton()}
-        </View>
-      </ScrollView>
-    )
+              <View style={{paddingHorizontal: 10, paddingTop: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
+                <View style={{marginLeft: 15, paddingLeft: 5, borderWidth: 0.5, borderRadius: 5, width: '70%', height: 40, justifyContent: 'center'}}>
+                  <Picker 
+                    selectedValue={violator_id}
+                    style={{ height: 40, width: 400, color: 'black' }}
+                    itemStyle={{height: 20}}
+                    onValueChange={(itemValue, itemIndex) => getNikDua(itemValue, "Violator")}
+                  >
+                    {functionKaryawanDua()}
+                  </Picker>
+                </View>
+              </View>
+            
+              <View style={{padding: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
+                <View style={{marginLeft: 15, paddingLeft: 5, backgroundColor: '#b8b8b8', borderWidth: 0.5, borderRadius: 5, width: '70%', height: 40, justifyContent: 'center'}}>
+                  <Text>{violator_nik != null ? violator_nik : '-'}</Text>
+                </View>
+              </View>
+              
+              <View style={{height: 40, justifyContent: 'center', paddingLeft: 10}}>
+                <Text>Deskripsi :</Text>
+              </View>
+          
+              <View style={{padding: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
+                <View style={{marginLeft: 15, paddingLeft: 5, borderWidth: 0.5, borderRadius: 5, width: '70%', height: 80, justifyContent: 'center'}}>
+                  <TextInput value={description} multiline onChangeText={(value) => setDescription(value)} style={{color: 'black'}} placeholder="Deskripsi" placeholderTextColor="grey" />
+                </View>
+              </View>
+    
+            </View>
+    
+            <View style={{borderBottomWidth: 0.5}}>
+              <View style={{height: 40, justifyContent: 'center', paddingLeft: 10}}>
+                <Text>Hukuman 1 :</Text>
+              </View>
+          
+              <View style={{paddingHorizontal: 10, paddingTop: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
+                <View style={{marginLeft: 15, paddingLeft: 5, borderWidth: 0.5, borderRadius: 5, width: '70%', height: 40, justifyContent: 'center'}}>
+                  <Picker 
+                    selectedValue={penalty_first_id}
+                    style={{ height: 40, width: 400, color: 'black' }}
+                    itemStyle={{height: 20}}
+                    onValueChange={(itemValue, itemIndex) => setPenaltiesFunc(itemValue, "First")}
+                  >
+                    {childPenalties()}
+                  </Picker>
+                </View>
+              </View>
+              <View style={{padding: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
+                <View style={{marginLeft: 15, paddingLeft: 5, borderWidth: 0.5, borderRadius: 5, width: '70%', height: 80, justifyContent: 'center'}}>
+                  <TextInput value={penalty_description} multiline onChangeText={(value) => setPenaltyFirstDescription(value)} style={{color: 'black'}} placeholder="Pelanggaran Deskripsi 1" placeholderTextColor="grey" />
+                </View>
+              </View>
+            </View>
+    
+            <View style={{borderBottomWidth: 0.5}}>
+              <View style={{height: 40, justifyContent: 'center', paddingLeft: 10}}>
+                <Text>Hukuman 2 :</Text>
+              </View>
+          
+              <View style={{paddingHorizontal: 10, paddingTop: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
+                <View style={{marginLeft: 15, paddingLeft: 5, borderWidth: 0.5, borderRadius: 5, width: '70%', height: 40, justifyContent: 'center'}}>
+                  <Picker 
+                    selectedValue={penalty_second_id}
+                    style={{ height: 40, width: 400, color: 'black' }}
+                    itemStyle={{height: 20}}
+                    onValueChange={(itemValue, itemIndex) => setPenaltiesFunc(itemValue, "Second")}
+                  >
+                    {childPenalties()}
+                  </Picker>
+                </View>
+              </View>
+              <View style={{padding: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
+                <View style={{marginLeft: 15, paddingLeft: 5, borderWidth: 0.5, borderRadius: 5, width: '70%', height: 80, justifyContent: 'center'}}>
+                  <TextInput value={penalty_description_second} multiline onChangeText={(value) => setPenaltySecondDescription(value)} style={{color: 'black'}} placeholder="Pelanggaran Deskripsi 2" placeholderTextColor="grey" />
+                </View>
+              </View>
+            </View>
+              
+    
+            {buttonImageTrigger()}
+    
+            {/* <View style={{marginTop: 20, flexDirection: 'row', height: 300, borderWidth: 0.3, justifyContent: 'center', alignItems: 'center'}}>
+              <View style={{justifyContent: 'center', alignItems: 'center', width: '50%', height: 300}}> */}
+                {imageContent()}
+    
+              {/* </View>
+            </View> */}
+    
+            <View style={{padding: 10, flexDirection: 'row', flex: 1, justifyContent: 'center'}}>
+              {functionButton()}
+            </View>
+          </ScrollView>
+        )
+      }else{
+        return (
+          <View style={{height: 250, padding: 10, borderColor: '#FEA82F', backgroundColor: '#d35400', borderWidth: 0.5, justifyContent: 'center', borderRadius: 10}}>
+            <Text style={{color: 'white'}}>Sorry, You don't have access this form 😔</Text>
+          </View>
+        )
+      }
+    }
   }
 
   return (

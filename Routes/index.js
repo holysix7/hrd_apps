@@ -4,10 +4,10 @@ import {
 	SplashScreen,
   BoardingScreen,
   Login,
-  Violation,
+  Get,
 	Main,
-	ShowViolation,
-	AddViolation,
+	Show,
+	Add,
 	Profile
 } from '../Pages'
 
@@ -25,10 +25,10 @@ const Routes = () => {
 			<Stack.Screen name="SplashScreen" component={SplashScreen} />
 			<Stack.Screen name="BoardingScreen" component={BoardingScreen} />
 			<Stack.Screen name="Login" component={Login} />
-			<Stack.Screen name="Violation" component={Violation} />
+			<Stack.Screen name="Get" component={Get} />
 			<Stack.Screen name="Main" component={Main} />
-			<Stack.Screen name="ShowViolation" component={ShowViolation} />
-			<Stack.Screen name="AddViolation" component={AddViolation} />
+			<Stack.Screen name="Show" component={Show} />
+			<Stack.Screen name="Add" component={Add} />
 			<Stack.Screen name="Profile" component={Profile} />
 
     </Stack.Navigator>  

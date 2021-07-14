@@ -34,7 +34,6 @@ const Login = ({navigation}) => {
   useEffect(() => {
     messaging().getToken().then(token => {
 			setRegistration_ids(token)
-			console.log(token)
 		});
 		
     // Firebase.initializeApp()
@@ -72,8 +71,6 @@ const Login = ({navigation}) => {
       BackHandler.removeEventListener("hardwareBackPress", backAction);
   }, []);
 
-	// console.log(registration_ids)
-
 	const submit = async() => {
 		setLoading(false)
 		const data = {
@@ -92,7 +89,6 @@ const Login = ({navigation}) => {
 				navigation.replace('Main')
       }else{
         setLoading(true)
-        console.log("response: ", res.data.data)
         Alert.alert(
           "Info",
           "Login Gagal, Username dan Password tidak cocok",
