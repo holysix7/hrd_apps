@@ -4,7 +4,6 @@ import { Container, Text, Button} from 'native-base'
 import Axios from 'axios'
 import AsyncStorage from "@react-native-community/async-storage"
 import sipLog from '../../../Assets/logo-sip370x50.png'
-import checked_image from '../../../Assets/check.png'
 import HRHQ from '../../../Assets/orange.jpg'
 import nopict from '../../../Assets/nopict.jpg'
 import moment from 'moment'
@@ -12,6 +11,7 @@ import base_url from '../../../System/base_url'
 import Geolocation from '@react-native-community/geolocation';
 import messaging from '@react-native-firebase/messaging';
 import app_version from '../../../System/app_version'
+import ContentToDo from './ContentToDo'
 
 const Main = ({navigation}) => {
   useEffect(() => {
@@ -72,8 +72,7 @@ const Main = ({navigation}) => {
     }
     var config = {
       method: 'get',
-      // url: `${base_url}/api/v2/hrds`,
-      url: `http://192.168.131.121:3000/api/v2/hrds`,
+      url: `${base_url}/api/v2/hrds`,
       headers: headers,
       params : data
     };
@@ -84,6 +83,7 @@ const Main = ({navigation}) => {
 			setTodo(response.data.data.todolist)
 			setFeature(response.data.data.feature)
 			setLoading(true)
+      console.log('mantap api sukses')
 		})
 		.catch(error => {
       console.log(error)
@@ -92,6 +92,7 @@ const Main = ({navigation}) => {
         "Silahkan Login Kembali",
         [
           { text: "OK", onPress: () => logout() }
+          // { text: "OK", onPress: () => console.log() }
         ],
         { cancelable: false }
       );
@@ -112,6 +113,7 @@ const Main = ({navigation}) => {
     const arrData = []
     if(feature.length > 0){
       feature.map((el, key) => {
+        // console.log(el.create_from_mobile_apps)
         arrData.push(
           <TouchableOpacity key={key} style={{marginHorizontal: 10, height: 150, alignItems: 'center', backgroundColor: '#FFFFFF', flexDirection: 'column'}} onPress={() => navigation.navigate('Get', {
             tbl: el.tbl_name,
@@ -126,25 +128,6 @@ const Main = ({navigation}) => {
               <Text style={{fontSize: 13, color: 'black'}}>{el.feature_name}</Text>
             </View>
           </TouchableOpacity>
-        )
-      })
-    }
-    return arrData
-  } 
-
-  const contentToDo = () => {
-    const arrData = []
-    if(todo.length > 0){
-      todo.map((el, key) => {
-        arrData.push(
-          <View key={key} style={{flexDirection: 'row'}}>
-            <View style={{flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-              { el.job_checked == true ? <Image source={checked_image} style={{width: 20, height: 20}} /> : <Text>*</Text>}
-            </View>
-            <View style={{paddingLeft: 10, flexDirection: 'column'}}>
-              <Text style={{fontSize: 13, color: 'black', paddingTop: 8, borderBottomWidth: 0.5, textAlign: 'justify', paddingRight: 15}}>{el.job_name} : {el.job_description}</Text>
-            </View>
-          </View>
         )
       })
     }
@@ -183,10 +166,10 @@ const Main = ({navigation}) => {
                 <View style={{flexDirection: 'row', paddingTop: 5, paddingLeft: 5}}>
                   <Text style={{color: 'black', fontSize: 10, textDecorationLine: 'underline'}}>To do list</Text> 
                 </View>
-                <View style={{flexDirection: 'row', paddingVertical: 5}}>
-                  <ScrollView style={{height: 240}}>
+                <View style={{flexDirection: 'row', paddingVertical: 5, height: 285, width: 315}}>
+                  <ScrollView>
                     <View style={{paddingLeft: 20, justifyContent: 'center'}}>
-                      {contentToDo()}
+                      <ContentToDo props={todo} />
                     </View>
                   </ScrollView>
                 </View>

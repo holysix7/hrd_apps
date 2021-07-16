@@ -9,14 +9,16 @@ import moment from 'moment'
 import base_url from '../../../../System/base_url'
 import app_version from '../../../../System/app_version'
 
-const ShowViolation = ({route, navigation}) => {
-  const {user_id, id, sys_plant_id, violator_id, violator_name, violator_nik, violation_time, violation_date, violation_status, violation_status_case, approve_1_by, approve_2_by, approve_3_by, enforcer_id, enforcer_name, enforcer_nik, whitness_id, whitness_name, whitness_nik, description, penalty_first_name, penalty_description, penalty_second_name, penalty_description_second, start_date, end_date} = route.params
+const Show = ({route, navigation}) => {
+  // const {user_id, id, sys_plant_id, violator_id, violator_name, violator_nik, violation_time, violation_date, violation_status, violation_status_case, approve_1_by, approve_2_by, approve_3_by, enforcer_id, enforcer_name, enforcer_nik, whitness_id, whitness_name, whitness_nik, description, penalty_first_name, penalty_description, penalty_second_name, penalty_description_second, start_date, end_date} = route.params
+  const {val, tbl_name} = route.params
   useEffect(() => {
     showViolation()
   }, [])
 	var timeNow 	                    = moment()
   const [refreshing, setRefreshing] = useState(false)
 	const [loading, setLoading]       = useState(true)
+  const [user_id, setUserId]        = useState(null)
   const [token, setToken]           = useState(null)
   const [data, setData]             = useState(null)
 
@@ -24,28 +26,18 @@ const ShowViolation = ({route, navigation}) => {
     console.log('ini val: ', value)
     console.log('ini type: ', type)
     const approve = parseInt(value)
-    if(type == 'Approve'){
-      var data = {
-        id: id,
-        sys_plant_id: sys_plant_id,
-        user_id: user_id,
-        approve: approve,
-        type: type,
-        tbl: 'violation',
-      }
-    }else{
-      var data = {
-        id: id,
-        sys_plant_id: sys_plant_id,
-        user_id: user_id,
-        cancel: approve,
-        type: type,
-        tbl: 'violation',
-      }
+    var data = {
+      id: val.id,
+      sys_plant_id: val.sys_plant_id,
+      user_id: user_id,
+      count_request: approve,
+      type_request: type,
+      tbl: tbl_name,
     }
+    console.log(data)
 		var config = {
 			method: 'put',
-      url: `${base_url}/api/v2/violation/approve`,
+      url: `${base_url}/api/v2/hrd_approve`,
 			headers: { 
 				'Authorization': `${token}`, 
 				'Content-Type': 'application/json', 
@@ -79,7 +71,8 @@ const ShowViolation = ({route, navigation}) => {
     })
     .catch(function(error){
       setLoading(true)
-      alert("Error Hubungi IT!")
+      // alert("Error Hubungi IT! (Submit " + type + " " + approve +"})")
+      showViolation() 
       console.log(error)
     })
   }
@@ -105,20 +98,22 @@ const ShowViolation = ({route, navigation}) => {
   const showViolation = async() => {
     setLoading(false)
     const isLogin = await AsyncStorage.getItem('key')
+    const user_id = await AsyncStorage.getItem('id')
 		setToken(isLogin)
+		setUserId(user_id)
     const headers = {
       'Authorization': `${isLogin}`, 
       'Content-Type': 'application/x-www-form-urlencoded', 
       'Cookie': '__profilin=p%3Dt'
     }
     const params = {
-      'id': id,
-      'sys_plant_id': sys_plant_id,
-      'tbl': 'violation',
+      'id': val.id,
+      'sys_plant_id': val.sys_plant_id,
+      'tbl': tbl_name,
       'app_version': app_version,
       'user_id': user_id
     }
-		Axios.get(`${base_url}/api/v2/violation/show`, {params: params, headers: headers})
+		Axios.get(`${base_url}/api/v2/hrd_show`, {params: params, headers: headers})
 		.then(response => {
 			setData(response.data.data)
 			setLoading(true)
@@ -135,52 +130,90 @@ const ShowViolation = ({route, navigation}) => {
   }
 
   const functionButton = () => {
-    if(data != null){
-      if(data.approve_1_by == null && data.approve_2_by == null && data.approve_3_by == null){
-        return (
-        <View style={{padding: 10, flexDirection: 'row', flex: 1, justifyContent: 'space-around'}}>
-          <Button style={{paddingHorizontal: 3, backgroundColor: '#d35400', borderRadius: 10}} onPress={() => submit('1', 'Approve')}>
-            <Text>Approve 1</Text>
-            <Image source={approved_biru} style={{width: 35, height: 35}} /> 
-          </Button>
-        </View>
-        )
-      }else if(data.approve_1_by != null && data.approve_2_by == null && data.approve_3_by == null){
-        return (
-        <View style={{padding: 10, flexDirection: 'row', flex: 1, justifyContent: 'space-around'}}>
-          <Button style={{paddingHorizontal: 3, backgroundColor: '#d35400', borderRadius: 10}} onPress={() => submit('1', 'Cancel')}>
-            <Text>Cancel 1</Text>
-            <Image source={Xdua} style={{width: 30, height: 30}} />
-          </Button>
-          <Button style={{paddingHorizontal: 3, backgroundColor: '#d35400', borderRadius: 10}} onPress={() => submit('2', 'Approve')}>
-            <Text>Approve 2</Text>
-            <Image source={approved_biru} style={{width: 35, height: 35}} /> 
-          </Button>
-        </View>
-        )
-      }else if(data.approve_1_by != null && data.approve_2_by != null && data.approve_3_by == null){
-        return (
-        <View style={{padding: 10, flexDirection: 'row', flex: 1, justifyContent: 'space-around'}}>
-          <Button style={{paddingHorizontal: 3, backgroundColor: '#d35400', borderRadius: 10}} onPress={() => submit('2', 'Cancel')}>
-            <Text>Cancel 2</Text>
-            <Image source={Xdua} style={{width: 30, height: 30}} />
-          </Button>
-          <Button style={{paddingHorizontal: 3, backgroundColor: '#d35400', borderRadius: 10}} onPress={() => submit('3', 'Approve')}>
-            <Text>Approve 3</Text>
-            <Image source={approved_biru} style={{width: 35, height: 35}} /> 
-          </Button>
-        </View>
-        )
-      }else{
-        return (
+    if(loading == true){
+      if(data != null){
+        if(data.approve_1_by == null && data.approve_2_by == null && data.approve_3_by == null){
+          return (
           <View style={{padding: 10, flexDirection: 'row', flex: 1, justifyContent: 'space-around'}}>
-            <Button style={{paddingHorizontal: 3, backgroundColor: '#d35400', borderRadius: 10}} onPress={() => submit('3', 'Cancel')}>
-              <Text>Cancel 3</Text>
-              <Image source={Xdua} style={{width: 35, height: 35}} /> 
+            <Button style={{paddingHorizontal: 3, backgroundColor: '#d35400', borderRadius: 10}} onPress={() => submit('1', 'Approve')}>
+              <Text>Approve 1</Text>
+              <Image source={approved_biru} style={{width: 35, height: 35}} /> 
             </Button>
           </View>
-        )
+          )
+        }else if(data.approve_1_by != null && data.approve_2_by == null && data.approve_3_by == null){
+          return (
+          <View style={{padding: 10, flexDirection: 'row', flex: 1, justifyContent: 'space-around'}}>
+            <Button style={{paddingHorizontal: 3, backgroundColor: '#d35400', borderRadius: 10}} onPress={() => submit('1', 'Cancel')}>
+              <Text>Cancel 1</Text>
+              <Image source={Xdua} style={{width: 30, height: 30}} />
+            </Button>
+            <Button style={{paddingHorizontal: 3, backgroundColor: '#d35400', borderRadius: 10}} onPress={() => submit('2', 'Approve')}>
+              <Text>Approve 2</Text>
+              <Image source={approved_biru} style={{width: 35, height: 35}} /> 
+            </Button>
+          </View>
+          )
+        }else if(data.approve_1_by != null && data.approve_2_by != null && data.approve_3_by == null){
+          return (
+          <View style={{padding: 10, flexDirection: 'row', flex: 1, justifyContent: 'space-around'}}>
+            <Button style={{paddingHorizontal: 3, backgroundColor: '#d35400', borderRadius: 10}} onPress={() => submit('2', 'Cancel')}>
+              <Text>Cancel 2</Text>
+              <Image source={Xdua} style={{width: 30, height: 30}} />
+            </Button>
+            <Button style={{paddingHorizontal: 3, backgroundColor: '#d35400', borderRadius: 10}} onPress={() => submit('3', 'Approve')}>
+              <Text>Approve 3</Text>
+              <Image source={approved_biru} style={{width: 35, height: 35}} /> 
+            </Button>
+          </View>
+          )
+        }else{
+          return (
+            <View style={{padding: 10, flexDirection: 'row', flex: 1, justifyContent: 'space-around'}}>
+              <Button style={{paddingHorizontal: 3, backgroundColor: '#d35400', borderRadius: 10}} onPress={() => submit('3', 'Cancel')}>
+                <Text>Cancel 3</Text>
+                <Image source={Xdua} style={{width: 35, height: 35}} /> 
+              </Button>
+            </View>
+          )
+        }
       }
+    }
+  }
+
+  const approveFunc = () => {
+    if(loading == true){
+      return (
+        <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-start'}}>
+          {
+            data != null ?
+            data.approve_1_by != null ? 
+            <View style={{justifyContent: 'center', alignItems: 'center'}}>
+              <Image source={approved_biru} style={{width: 30, height: 30}} /> 
+            </View> : 
+            null :
+            null
+          } 
+          {
+            data != null ?
+            data.approve_2_by != null ? 
+            <View style={{justifyContent: 'center', alignItems: 'center'}}>
+              <Image source={approved_biru} style={{width: 30, height: 30}} /> 
+            </View> : 
+            null : 
+            null
+          } 
+          {
+            data != null ?
+            data.approve_3_by != null ? 
+            <View style={{justifyContent: 'center', alignItems: 'center'}}>
+              <Image source={approved_biru} style={{width: 30, height: 30}} /> 
+            </View> : 
+            null :
+            null
+          }     
+        </View>
+      )
     }
   }
 
@@ -307,35 +340,7 @@ const ShowViolation = ({route, navigation}) => {
         {loading == false ? <View style={{backgroundColor: '#DDDDDD', alignItems: 'center', justifyContent: 'center', paddingTop: 100}}><ActivityIndicator size="large" color="#0000ff"/></View> : content() }
       </View>
       <View style={{flexDirection: 'column', height: 90, alignItems: 'center', backgroundColor: '#DDDDDD'}}>
-        <View style={{flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-start'}}>
-          {
-            data != null ?
-            data.approve_1_by != null ? 
-            <View style={{justifyContent: 'center', alignItems: 'center'}}>
-              <Image source={approved_biru} style={{width: 30, height: 30}} /> 
-            </View> : 
-            null :
-            null
-          } 
-          {
-            data != null ?
-            data.approve_2_by != null ? 
-            <View style={{justifyContent: 'center', alignItems: 'center'}}>
-              <Image source={approved_biru} style={{width: 30, height: 30}} /> 
-            </View> : 
-            null : 
-            null
-          } 
-          {
-            data != null ?
-            data.approve_3_by != null ? 
-            <View style={{justifyContent: 'center', alignItems: 'center'}}>
-              <Image source={approved_biru} style={{width: 30, height: 30}} /> 
-            </View> : 
-            null :
-            null
-          } 
-        </View>
+        {approveFunc()}
         <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
           {functionButton()}
         </View>
@@ -344,4 +349,4 @@ const ShowViolation = ({route, navigation}) => {
   ) 
 }
 
-export default ShowViolation
+export default Show

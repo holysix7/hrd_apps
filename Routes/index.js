@@ -5,6 +5,7 @@ import {
   BoardingScreen,
   Login,
   Get,
+	// GetContent,
 	Main,
 	Show,
 	Add,
@@ -29,6 +30,7 @@ const Routes = () => {
 			<Stack.Screen name="Main" component={Main} />
 			<Stack.Screen name="Show" component={Show} />
 			<Stack.Screen name="Add" component={Add} />
+			{/* <Stack.Screen name="GetContent" component={GetContent} /> */}
 			<Stack.Screen name="Profile" component={Profile} />
 
     </Stack.Navigator>  

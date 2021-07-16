@@ -13,7 +13,8 @@ import base_url from '../../../../System/base_url'
 import app_version from '../../../../System/app_version'
 
 const AddViolation = ({route, navigation}) => {
-  const {sys_plant_id, id, name, nik} = route.params
+  // const {sys_plant_id, id, name, nik} = route.params
+  const {row, tbl_name} = route.params
   useEffect(() => {
     getSysAccount()
   }, [])
@@ -62,17 +63,17 @@ const AddViolation = ({route, navigation}) => {
     setToken(token)
     setLoading(false)
     const params = {
-      tbl: 'violation',
+      tbl: tbl_name,
       app_version: app_version,
-      sys_plant_id: sys_plant_id,
-      user_id: id
+      sys_plant_id: row.sys_plant_id,
+      user_id: row.id
     }
     const headers = {
       'Authorization': `${token}`, 
       'Content-Type': 'application/x-www-form-urlencoded', 
       'Cookie': '__profilin=p%3Dt'
     }
-		Axios.get(`http://192.168.131.121:3000/api/v2/hrds/new?`, {params: params, headers: headers})
+		Axios.get(`${base_url}/api/v2/hrds/new?`, {params: params, headers: headers})
 		.then(response => {
       setCode(response.data.code)
 			setData(response.data.data)
@@ -80,6 +81,7 @@ const AddViolation = ({route, navigation}) => {
 		})
 		.catch(error => {
       console.log(error)
+      console.log('kena error')
       Alert.alert(
         "Error",
         "Hubungi IT Department",
@@ -96,7 +98,9 @@ const AddViolation = ({route, navigation}) => {
     setLoading(false)
     const token = await AsyncStorage.getItem('key')
     const data = {
-      sys_plant_id: sys_plant_id,
+      sys_plant_id: row.sys_plant_id,
+      user_id: row.id,
+      tbl: tbl_name,
       penalty_first_id: penalty_first_id,
       penalty_description: penalty_description,
       penalty_description_second: penalty_description_second,
@@ -107,9 +111,7 @@ const AddViolation = ({route, navigation}) => {
       violation_time: violationTimeText,
       violation_date: violation_date,
       item_image: item_image,
-      app_version: app_version,
-      tbl: 'violation',
-      user_id: id
+      app_version: app_version
     }
 		var config = {
 			method: 'post',
@@ -124,7 +126,7 @@ const AddViolation = ({route, navigation}) => {
     Axios(config)
     .then(function(response){
       setLoading(true)
-      navigation.navigate('Violation')
+      navigation.navigate('Get')
       alert("Success Created!")
       console.log('success save data')
     })
@@ -305,26 +307,25 @@ const AddViolation = ({route, navigation}) => {
     const params = {
       tbl: 'employee',
       app_version: app_version,
-      sys_plant_id: sys_plant_id,
+      sys_plant_id: row.sys_plant_id,
       sys_department_id: val[0].id,
-      user_id: id
+      user_id: row.id
     }
     const headers = {
       'Authorization': `${token}`, 
       'Content-Type': 'application/x-www-form-urlencoded', 
       'Cookie': '__profilin=p%3Dt'
     }
-		Axios.get(`http://192.168.131.121:3000/api/v2/hrds?`, {params: params, headers: headers})
-		// Axios.get(`${base_url}/api/v2/hrds?`, {params: params, headers: headers})
+		Axios.get(`${base_url}/api/v2/hrds?`, {params: params, headers: headers})
 		.then(response => {
-			getKaryawan(response.data.data != null ? response.data.data : null)
+			getKaryawan(response.data.data)
 			setLoading(true)
 		})
 		.catch(error => {
       console.log(error)
       Alert.alert(
         "Error",
-        "Hubungi IT Department",
+        "Hubungi IT Department (Faild Get Dept 1)",
         [
           { text: "OK", onPress: () => console.log('Stop API') }
         ],
@@ -353,17 +354,16 @@ const AddViolation = ({route, navigation}) => {
     const params = {
       tbl: 'employee',
       app_version: app_version,
-      sys_plant_id: sys_plant_id,
+      sys_plant_id: row.sys_plant_id,
       sys_department_id: val.length > 0 || val != null ? val[0].id : null,
-      user_id: id
+      user_id: row.id
     }
     const headers = {
       'Authorization': `${token}`, 
       'Content-Type': 'application/x-www-form-urlencoded', 
       'Cookie': '__profilin=p%3Dt'
     }
-		Axios.get(`http://192.168.131.121:3000/api/v2/hrds?`, {params: params, headers: headers})
-		// Axios.get(`${base_url}/api/v2/hrds?`, {params: params, headers: headers})
+		Axios.get(`${base_url}/api/v2/hrds?`, {params: params, headers: headers})
 		.then(response => {
 			getKaryawanDua(response.data.data != null ? response.data.data : null)
 			setLoading(true)
@@ -372,7 +372,7 @@ const AddViolation = ({route, navigation}) => {
       console.log(error)
       Alert.alert(
         "Error",
-        "Hubungi IT Department",
+        "Hubungi IT Department (Faild Get Dept 1)",
         [
           { text: "OK", onPress: () => console.log('Stop API') }
         ],
@@ -411,6 +411,7 @@ const AddViolation = ({route, navigation}) => {
     arrData.push(
       <Picker.Item label={"Pilih"} value={"0"} key={"AbcdkOWAK"} />
     )
+    // console.log(data)
     if(code != null){
       if(data != null){
         if(data.department_list.length > 0){
@@ -468,7 +469,7 @@ const AddViolation = ({route, navigation}) => {
           karyawan.map((val, i) => {
             const element = [{
                 id: val.id,
-                nik:  val.nik
+                nik:  val.list_col_a
               }
             ]
             data.push(
@@ -489,7 +490,7 @@ const AddViolation = ({route, navigation}) => {
           karyawanDua.map((val, i) => {
             const element = [{
                 id: val.id,
-                nik:  val.nik
+                nik:  val.list_col_a
               }
             ]
             data.push(
@@ -503,7 +504,6 @@ const AddViolation = ({route, navigation}) => {
   }
 
   const content = () => {
-    console.log(code)
     if(code != null){
       if(code != 403){
         return (
@@ -515,12 +515,12 @@ const AddViolation = ({route, navigation}) => {
               </View>
               <View style={{paddingHorizontal: 10, paddingTop: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
                 <View style={{marginLeft: 15, paddingLeft: 5, borderWidth: 0.5, borderRadius: 5, width: '70%', height: 40, justifyContent: 'center', backgroundColor: '#b8b8b8'}}>
-                  <Text>{name != null ? name : '-'}</Text>
+                  <Text>{row.name != null ? row.name : '-'}</Text>
                 </View>
               </View>
               <View style={{padding: 10, flexDirection: 'row', flex: 1, justifyContent: 'flex-end'}}>
                 <View style={{marginLeft: 15, paddingLeft: 5, backgroundColor: '#b8b8b8', borderWidth: 0.5, borderRadius: 5, width: '70%', height: 40, justifyContent: 'center'}}>
-                  <Text>{nik != null ? nik : "-"}</Text>
+                  <Text>{row.nik != null ? row.nik : "-"}</Text>
                 </View>
               </View>
               
