@@ -17,23 +17,20 @@ import Geolocation from '@react-native-community/geolocation';
 import GetContent from './GetContent'
 
 const HomeScreen = ({navigation, route}) => {
-  const {tbl, f_name, create_access, edit_access} = route.params 
-  // console.log(create_access)
+  const {tbl, f_name, create_access, edit_access, user_id} = route.params 
   useEffect(() => {
-    cekLogin()
-    getLocation()
-    // if(tbl == 'employee'){
-    getAllDepartment()
-    // }
+    if(session()){
+      setLoading(true)
+    }
+    updatePicker()
   }, [])
   /**
    * Auth
    */
   const [token, setToken]                   = useState(null)
   const [sysPlantId, setSysPlantId]         = useState(0)
-  const [get_depts, setDept]                = useState([])
-  const [sys_department_id, setDeptId]      = useState(0)
-  const [user_id, setId]                    = useState(null)
+  const [get_depts, setDept]                = useState(null)
+  const [sys_department_id, setDeptId]      = useState(null)
   const [name, setName]                     = useState(null)
   const [user, setUser]                     = useState(null)
   const [code, setCode]                     = useState(null)
@@ -43,7 +40,6 @@ const HomeScreen = ({navigation, route}) => {
   
   var timeNow 	                            = moment()
   const [refreshing, setRefreshing]         = useState(false);
-  const [data, setData]                     = useState([])
 	const [loading, setLoading]               = useState(true);
 	const [mode, setMode]		                  = useState(null)
 	const [prop_button, setPropButton]        = useState(null)
@@ -63,11 +59,11 @@ const HomeScreen = ({navigation, route}) => {
     })
   }
 
-	const cekLogin = async() => {
+  const session = async() => {
+    setLoading(false)
     const isLogin = await AsyncStorage.getItem('key')
     const user = await AsyncStorage.getItem('user')
     const name = await AsyncStorage.getItem('name')
-    const id = await AsyncStorage.getItem('id')
     const sys_department_id = await AsyncStorage.getItem('sys_department_id')
     const duty_plant_option_select = await AsyncStorage.getItem('duty_plant_option_select')
     const feature = await AsyncStorage.getItem('feature')
@@ -77,21 +73,24 @@ const HomeScreen = ({navigation, route}) => {
 		setToken(isLogin)
     setName(name)
     setUser(user)
-    setId(id)
     setDuty(JSON.parse(duty_plant_option_select))
     setFeature(JSON.parse(feature))
     setPropButton({
       sys_plant_id: JSON.parse(sys_plant_id),
-      id: id,
       name: name,
       nik: user,
       create_access: create_access
     })
-	}
-  
+  }
+
   const searchData = () => {
     setLoading(false)
-    const data = {
+    var headers = {
+      'Authorization': `${token}`, 
+      'Content-Type': 'application/x-www-form-urlencoded', 
+      'Cookie': '__profilin=p%3Dt'
+    }
+    var data = {
       'sys_plant_id': sysPlantId,
       'start_date': moment(start_date).format("YYYY-MM-DD"),
       'end_date': moment(end_date).format("YYYY-MM-DD"),
@@ -102,26 +101,17 @@ const HomeScreen = ({navigation, route}) => {
       'user_id': user_id,
       'sys_department_id': sys_department_id
     }
-
-    const headers = {
-      'Authorization': `${token}`, 
-      'Content-Type': 'application/x-www-form-urlencoded', 
-      'Cookie': '__profilin=p%3Dt'
-    }
-
     var config = {
       method: 'get',
       url: `${base_url}/api/v2/hrds`,
       headers: headers,
       params : data
     };
-
-		Axios(config)
-		.then(response => {
+    Axios(config)
+    .then(response => {
       setCode(response.data.code)
-      console.log(response.data.data)
-			setProps(response.data.data)
-			setLoading(true)
+      setProps(response.data.data)
+      setLoading(true)
       const newProps = {
         code: response.data.code,
         data_count: parseInt(response.data.data_count),
@@ -134,72 +124,19 @@ const HomeScreen = ({navigation, route}) => {
       }
       setProps(newProps)
       console.log('mantap berhasil load')
-		})
-		.catch(error => {
+    })
+    .catch(error => {
       console.log(error)
       Alert.alert(
         "Error",
-        "Hubungi IT!",
+        "Hubungi IT (Search Methods)!",
         [
           { text: "OK", onPress: () => console.log('wk') }
         ],
         { cancelable: false }
       );
-			setLoading(true)
-		})
-  }
-
-  const getAllDepartment = () => {
-    setLoading(false)
-    const data = {
-      // tbl: tbl,
-      tbl: 'violation',
-      app_version: app_version,
-      sys_plant_id: sysPlantId,
-      user_id: user_id
-    }
-    // console.log(data)
-    const headers = {
-      'Authorization': `${token}`, 
-      'Content-Type': 'application/x-www-form-urlencoded', 
-      'Cookie': '__profilin=p%3Dt'
-    }
-    var config = {
-      method: 'get',
-      url: `${base_url}/api/v2/hrds/new?`,
-      headers: headers,
-      params : data
-    };
-
-		Axios(config)
-		.then(response => {
-			setDept(response.data.data != null ? response.data.data.department_list : [])
-			setLoading(true)
-      const newProps = {
-        code: response.data.code,
-        data_count: parseInt(response.data.data_count),
-        data: JSON.stringify(response.data.data),
-        tbl_name: response.data.tbl_name,
-        column_name: response.data.column_name,
-        start_date: startDateText,
-        end_date: endDateText,
-        form_name: f_name
-      }
-      setProps(newProps)
-      console.log('mantap berhasil load')
-		})
-		.catch(error => {
-      console.log(error)
-      Alert.alert(
-        "Error",
-        "Hubungi IT!",
-        [
-          { text: "OK", onPress: () => console.log('wk') }
-        ],
-        { cancelable: false }
-      );
-			setLoading(true)
-		})
+      setLoading(true)
+    })
   }
   
   const onChange = (event, val) => {
@@ -257,14 +194,53 @@ const HomeScreen = ({navigation, route}) => {
     setShow(true)
     setMode(val)
   }
-  
-  const triggeredAPIListKaryawan = (val) => {
-    setDeptId(val)
-    searchData()
-  }
 
   const dateFunction = () => {
-    if(tbl != 'employee'){
+    if(tbl == 'employee'){
+      var loopDept = []
+      loopDept.push(
+        <Picker.Item label={'Pilih Department'} value={0} key={'AOWkowak'} />
+      )
+      if(get_depts != null){
+        if(get_depts.length > 0){
+          get_depts.map((val, key) => {
+            loopDept.push(
+              <Picker.Item label={val.name} value={val.id} key={key} />
+            )
+          })
+        }
+        if(sysPlantId > 0){
+          return (
+            <View style={{flexDirection: 'row', backgroundColor: 'white'}}>
+              <View style={{flexDirection: 'column', borderWidth: 0.8, borderColor:'grey', height: 40, flex: 1, margin: 5, justifyContent: 'center'}}>
+                <Picker
+                  selectedValue={sys_department_id}
+                  style={{ height: 40, width: 400, color: 'black'}}
+                  itemStyle={{height: 20}}
+                  onValueChange={(val) => setDeptId(val)}
+                >
+                  {loopDept}
+                </Picker>
+              </View>
+              <Button style={{flexDirection: 'column', backgroundColor: '#F7A440', borderRadius: 15, height: 40, width: 45, margin: 5, justifyContent: 'center'}} onPress={() => searchData()}>
+                <Image source={search} style={{width: 25, height: 25, marginLeft: 2}}/>
+              </Button>
+            </View>
+          )
+        }else{
+          return (
+            <View style={{flexDirection: 'row', backgroundColor: 'white'}}>
+              <View style={{flexDirection: 'column', borderWidth: 0.8, borderColor:'grey', height: 40, flex: 1, margin: 5, justifyContent: 'center', backgroundColor: '#b8b8b8'}}>
+                <Text>Gagal Memanggil List Department</Text>
+              </View>
+              <Button style={{flexDirection: 'column', backgroundColor: '#F7A440', borderRadius: 15, height: 40, width: 45, margin: 5, justifyContent: 'center'}} onPress={() => alert("Silahkan pilih plant terlebih dahulu")}>
+                <Image source={search} style={{width: 25, height: 25, marginLeft: 2}}/>
+              </Button>
+            </View>
+          )
+        }
+      }
+    }else{
       if(sysPlantId > 0){
         return(
           <View style={{flexDirection: 'row', backgroundColor: 'white', borderBottomWidth: 0.7, borderColor: 'grey', paddingBottom: 5}}>
@@ -315,40 +291,12 @@ const HomeScreen = ({navigation, route}) => {
           </View>
         )
       }
-    }else{
-      var loopDept = []
-      if(get_depts.length > 0){
-        get_depts.map((val, key) => {
-          loopDept.push(
-            <Picker.Item label={val.name} value={val.id} key={key} />
-          )
-        })
-      }else{
-        loopDept.push(
-          <Picker.Item label={'Gagal Memanggil List Department'} value={0} key={1} />
-        )
-      }
-      return (
-        <View style={{flexDirection: 'row', backgroundColor: 'white'}}>
-          <View style={{flexDirection: 'column', borderWidth: 0.8, borderColor:'grey', height: 40, flex: 1, margin: 5, justifyContent: 'center'}}>
-            <Picker
-              selectedValue={sys_department_id}
-              style={{ height: 40, width: 400, color: 'black'}}
-              itemStyle={{height: 20}}
-              onValueChange={(val) => triggeredAPIListKaryawan(val)}
-            >
-              {loopDept}
-            </Picker>
-          </View>
-        </View>
-      )
     }
   }
 
   const onRefresh = () => {
     setRefreshing(false)
-    searchData()
-    getAllDepartment()
+    updatePicker()
   }
 
   const pickerItemFunc = () => {
@@ -363,8 +311,8 @@ const HomeScreen = ({navigation, route}) => {
     return data
   }
 
-  const updatePicker = (value) => {
-    setSysPlantId(value)
+  const updatePicker = async(value) => {
+    const tkn = await AsyncStorage.getItem('key')
     setPropButton({
       sys_plant_id: value,
       id: user_id,
@@ -372,79 +320,198 @@ const HomeScreen = ({navigation, route}) => {
       nik: user,
       create_access: create_access
     })
+    var headers = {
+      'Authorization': `${tkn}`, 
+      'Content-Type': 'application/x-www-form-urlencoded', 
+      'Cookie': '__profilin=p%3Dt'
+    }
+    var params = {
+      tbl: 'department',
+      app_version: app_version,
+      sys_plant_id: value != null ? value : sysPlantId,
+      user_id: user_id,
+      type_request: `for_${tbl}`
+    }
+    var config = {
+      method: 'get',
+      url: `${base_url}/api/v2/hrds`,
+      headers: headers,
+      params : params
+    };
+    Axios(config)
+    .then(response => {
+      if(response.data.code == 403){
+        Alert.alert(
+          "Info",
+          `Maaf Anda tidak memiliki akses untuk melihat list ${f_name}!`,
+          [
+            { text: "OK", onPress: () => console.log('wk') }
+          ],
+          { cancelable: false }
+        );
+      }else{
+        setDept(response.data.data)
+        console.log('mantap berhasil load')
+      }
+      setLoading(true)
+    })
+    .catch(error => {
+      console.log(error)
+      Alert.alert(
+        "Info",
+        "Silahkan Refresh Halaman Ini!",
+        [
+          { text: "OK", onPress: () => console.log('wk') }
+        ],
+        { cancelable: false }
+      );
+      setLoading(true)
+    })
   }
   
   const GetContent = () => {
     const arrData = []
-    if(props != null){
-      if(props.code != 403){
-        if(props.data_count > 0){
-          var data = JSON.parse(props.data)
-          data.map((val, key) => {
-            var column_name = props.column_name
-            column_name.map((valKey, keyKey) => {
-              var keduaCuk = valKey.key
-            })
-            console.log(val)
-            arrData.push(
-              <View key={key} style={{flexDirection: 'row', flexWrap: 'nowrap', paddingHorizontal: 22}}>
-                <Button style={{marginTop: 10, alignItems: 'center', width: 350, borderRadius: 10, backgroundColor: '#F7A440', flexDirection: 'row'}} onPress={() => {
-                  navigation.navigate('Show', {
-                    val: val,
-                    tbl_name: tbl
-                  })
-                }}>
-                  <View style={{flex: 1, flexDirection: 'column', alignItems: 'flex-start', width: '50%'}}>
-                    <Text style={{fontSize: 11, color: 'black'}}>{val.list_col_a}</Text>
-                    <Text style={{fontSize: 11, color: 'black'}}>{val.list_col_c}</Text>
-                  </View>
-                  {val.list_col_d != null ? 
-                    <View style={{width: '50%', flexDirection: 'column', alignItems: 'flex-end'}}>
-                      <Text style={{fontSize: 11, color: 'black'}}>{val.list_col_b}</Text>
-                      <Text style={{fontSize: 11, color: 'black'}}>{val.list_col_d}</Text>
-                    </View> : 
-                    <View style={{width: '50%', flexDirection: 'column', alignItems: 'flex-end'}}>
-                      <Text style={{fontSize: 11, color: 'black'}}>{val.list_col_b}</Text>
+    if(tbl == 'employee'){
+      if(props != null){
+        if(props.code != 403){
+          if(props.data_count > 0){
+            var data = JSON.parse(props.data)
+            data.map((val, key) => {
+              var column_name = props.column_name
+              column_name.map((valKey, keyKey) => {
+                var keduaCuk = valKey.key
+              })
+              arrData.push(
+                <View key={key} style={{flexDirection: 'row', flexWrap: 'nowrap', paddingHorizontal: 22}}>
+                  <Button style={{marginTop: 10, alignItems: 'center', width: 350, borderRadius: 10, backgroundColor: '#F7A440', flexDirection: 'row'}} onPress={() => {
+                    navigation.navigate('Show', {
+                      val: val,
+                      tbl_name: tbl
+                    })
+                  }}>
+                    <View style={{flex: 1, flexDirection: 'column', alignItems: 'flex-start', width: '50%'}}>
+                      <Text style={{fontSize: 11, color: 'black'}}>{val.list_col_a}</Text>
+                      <Text style={{fontSize: 11, color: 'black'}}>{val.list_col_c}</Text>
                     </View>
+                    {val.list_col_d != null ? 
+                      <View style={{width: '50%', flexDirection: 'column', alignItems: 'flex-end'}}>
+                        <Text style={{fontSize: 11, color: 'black'}}>{val.list_col_b}</Text>
+                        <Text style={{fontSize: 11, color: 'black'}}>{val.list_col_d}</Text>
+                      </View> : 
+                      <View style={{width: '50%', flexDirection: 'column', alignItems: 'flex-end'}}>
+                        <Text style={{fontSize: 11, color: 'black'}}>{val.list_col_b}</Text>
+                      </View>
+                      }
+                    { 
+                      val.approve_3_by != null ?
+                      <View style={{justifyContent: 'center', alignItems: 'center', paddingRight: 5}}>
+                        <Image source={check} style={{width: 25, height: 25}} />
+                      </View> :
+                      null
                     }
-                  { 
-                    val.approve_3_by != null ?
-                    <View style={{justifyContent: 'center', alignItems: 'center', paddingRight: 5}}>
-                      <Image source={check} style={{width: 25, height: 25}} />
-                    </View> :
-                    null
-                  }
-                </Button>
+                  </Button>
+                </View>
+              )
+            })
+          }else{
+            arrData.push(
+              <View key={'1'} style={{flexDirection: 'row', paddingTop: 10, paddingHorizontal: 22}}>
+                <View style={{backgroundColor: '#d35400', height: 100, paddingVertical: 20, justifyContent: 'center', paddingHorizontal: 5, borderWidth: 0.5, borderRadius: 10, borderColor: '#FEA82F'}}>
+                  <Text style={{color: 'white', fontSize: 13}}>Tidak Ada Data Pada Tanggal  </Text>
+                  <Text style={{color: 'white', fontSize: 13}}>{props.start_date} - {props.end_date} </Text>
+                </View>
               </View>
             )
-          })
+          }
         }else{
           arrData.push(
             <View key={'1'} style={{flexDirection: 'row', paddingTop: 10, paddingHorizontal: 22}}>
-              <View style={{flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#d35400', height: 100, width: 350, padding: 20, borderWidth: 0.5, borderRadius: 10, borderColor: '#FEA82F'}}>
-                <Text style={{color: 'white', fontSize: 13}}>Tidak Ada Data Pada Tanggal  </Text>
-                <Text style={{color: 'white', fontSize: 13}}>{props.start_date} - {props.end_date} </Text>
+              <View style={{backgroundColor: '#d35400', height: 100, paddingVertical: 20, justifyContent: 'center', paddingHorizontal: 5, borderWidth: 0.5, borderRadius: 10, borderColor: '#FEA82F'}}>
+                <Text style={{color: 'white', fontSize: 13}}>Maaf Anda Tidak Memiliki Hak Akses Untuk Melihat Data <Text style={{fontWeight: 'bold', color: 'white', fontSize: 13}}>{f_name}</Text> Berdasarkan Department</Text>
               </View>
             </View>
           )
         }
       }else{
-        arrData.push(
-          <View key={'1'} style={{flexDirection: 'row', paddingTop: 10, paddingHorizontal: 22}}>
-            <View style={{backgroundColor: '#d35400', height: 100, padding: 20, borderWidth: 0.5, borderRadius: 10, borderColor: '#FEA82F'}}>
-              <Text style={{color: 'white', fontSize: 13}}>Maaf Anda Tidak Memiliki Hak Akses</Text>
+          arrData.push(
+            <View key={'1'} style={{flexDirection: 'row', paddingTop: 10, paddingHorizontal: 22}}>
+              <View style={{backgroundColor: '#d35400', height: 100, paddingVertical: 20, justifyContent: 'center', paddingHorizontal: 5, borderWidth: 0.5, borderRadius: 10, borderColor: '#FEA82F'}}>
+                <Text style={{color: 'white', fontSize: 13}}>Silahkan Cari Data <Text style={{fontWeight: 'bold', color: 'white', fontSize: 13}}>{f_name != null ? f_name : null}</Text> Berdasarkan Department</Text>
+              </View>
             </View>
-          </View>
-        )
+          )
       }
     }else{
-        arrData.push(
-          <View key={'1'} style={{flexDirection: 'row', paddingTop: 10, paddingHorizontal: 22}}>
-            <View style={{backgroundColor: '#d35400', height: 100, padding: 20, borderWidth: 0.5, borderRadius: 10, borderColor: '#FEA82F'}}>
-              <Text style={{color: 'white', fontSize: 13}}>Silahkan Cari Data <Text style={{fontWeight: 'bold', color: 'white', fontSize: 13}}>{f_name != null ? f_name : null}</Text> Berdasarkan Tanggal</Text>
+      if(props != null){
+        if(props.code != 403){
+          if(props.data_count > 0){
+            var data = JSON.parse(props.data)
+            data.map((val, key) => {
+              var column_name = props.column_name
+              column_name.map((valKey, keyKey) => {
+                var keduaCuk = valKey.key
+              })
+              arrData.push(
+                <View key={key} style={{flexDirection: 'row', flexWrap: 'nowrap', paddingHorizontal: 22}}>
+                  <Button style={{marginTop: 10, alignItems: 'center', width: 350, borderRadius: 10, backgroundColor: '#F7A440', flexDirection: 'row'}} onPress={() => {
+                    navigation.navigate('Show', {
+                      val: val,
+                      tbl_name: tbl
+                    })
+                  }}>
+                    <View style={{flex: 1, flexDirection: 'column', alignItems: 'flex-start', width: '50%'}}>
+                      <Text style={{fontSize: 11, color: 'black'}}>{val.list_col_a}</Text>
+                      <Text style={{fontSize: 11, color: 'black'}}>{val.list_col_c}</Text>
+                    </View>
+                    {val.list_col_d != null ? 
+                      <View style={{width: '50%', flexDirection: 'column', alignItems: 'flex-end'}}>
+                        <Text style={{fontSize: 11, color: 'black'}}>{val.list_col_b}</Text>
+                        <Text style={{fontSize: 11, color: 'black'}}>{val.list_col_d}</Text>
+                      </View> : 
+                      <View style={{width: '50%', flexDirection: 'column', alignItems: 'flex-end'}}>
+                        <Text style={{fontSize: 11, color: 'black'}}>{val.list_col_b}</Text>
+                      </View>
+                      }
+                    { 
+                      val.approve_3_by != null ?
+                      <View style={{justifyContent: 'center', alignItems: 'center', paddingRight: 5}}>
+                        <Image source={check} style={{width: 25, height: 25}} />
+                      </View> :
+                      null
+                    }
+                  </Button>
+                </View>
+              )
+            })
+          }else{
+            arrData.push(
+              <View key={'1'} style={{flexDirection: 'row', paddingTop: 10, paddingHorizontal: 22}}>
+                <View style={{backgroundColor: '#d35400', height: 100, paddingVertical: 20, justifyContent: 'center', paddingHorizontal: 5, borderWidth: 0.5, borderRadius: 10, borderColor: '#FEA82F'}}>
+                  <Text style={{color: 'white', fontSize: 13}}>Tidak Ada Data Pada Tanggal  </Text>
+                  <Text style={{color: 'white', fontSize: 13}}>{props.start_date} - {props.end_date} </Text>
+                </View>
+              </View>
+            )
+          }
+        }else{
+          arrData.push(
+            <View key={'1'} style={{flexDirection: 'row', paddingTop: 10, paddingHorizontal: 22}}>
+              <View style={{backgroundColor: '#d35400', height: 100, paddingVertical: 20, justifyContent: 'center', paddingHorizontal: 5, borderWidth: 0.5, borderRadius: 10, borderColor: '#FEA82F'}}>
+                <Text style={{color: 'white', fontSize: 13}}>Maaf Anda Tidak Memiliki Hak Akses</Text>
+              </View>
             </View>
-          </View>
-        )
+          )
+        }
+      }else{
+          arrData.push(
+            <View key={'1'} style={{flexDirection: 'row', paddingTop: 10, paddingHorizontal: 22}}>
+              <View style={{backgroundColor: '#d35400', height: 100, paddingVertical: 20, justifyContent: 'center', paddingHorizontal: 5, borderWidth: 0.5, borderRadius: 10, borderColor: '#FEA82F'}}>
+                <Text style={{color: 'white', fontSize: 13}}>Silahkan Cari Data <Text style={{fontWeight: 'bold', color: 'white', fontSize: 13}}>{f_name != null ? f_name : null}</Text> Berdasarkan Tanggal</Text>
+              </View>
+            </View>
+          )
+      }
+
     }
     return arrData
   }

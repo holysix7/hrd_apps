@@ -66,7 +66,8 @@ const AddViolation = ({route, navigation}) => {
       tbl: tbl_name,
       app_version: app_version,
       sys_plant_id: row.sys_plant_id,
-      user_id: row.id
+      user_id: row.id,
+      type_request: `for_${tbl_name}`
     }
     const headers = {
       'Authorization': `${token}`, 

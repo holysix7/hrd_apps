@@ -80,8 +80,20 @@ const Main = ({navigation}) => {
 		Axios(config)
 		.then(response => {
       setCode(response.data.code)
-			setTodo(response.data.data.todolist)
-			setFeature(response.data.data.feature)
+      if(response.data.code == 403){
+        Alert.alert(
+          "Info",
+          "Maaf anda tidak memiliki hak akses, silahkan hubungi IT Dept.",
+          [
+            { text: "OK", onPress: () => logout() }
+            // { text: "OK", onPress: () => console.log() }
+          ],
+          { cancelable: false }
+        );
+      }else{
+        setTodo(response.data.data.todolist)
+        setFeature(response.data.data.feature)
+      }
 			setLoading(true)
       console.log('mantap api sukses')
 		})
@@ -113,13 +125,13 @@ const Main = ({navigation}) => {
     const arrData = []
     if(feature.length > 0){
       feature.map((el, key) => {
-        // console.log(el.create_from_mobile_apps)
         arrData.push(
           <TouchableOpacity key={key} style={{marginHorizontal: 10, height: 150, alignItems: 'center', backgroundColor: '#FFFFFF', flexDirection: 'column'}} onPress={() => navigation.navigate('Get', {
             tbl: el.tbl_name,
             f_name: el.feature_name,
             create_access: el.create_from_mobile_apps,
-            edit_access: el.edit_from_mobile_apps
+            edit_access: el.edit_from_mobile_apps,
+            user_id: id
           })}>
             <View style={{paddingTop: 25}}>
               <Image source={sipLog} style={{height: 50, width: 50}} />

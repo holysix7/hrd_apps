@@ -101,7 +101,7 @@ const Login = ({navigation}) => {
       }
 		}).catch((err) => {
 			setLoading(true)
-			alert("Error: ", err)
+			alert("Error: Hubungi IT Dept (API Login)")
 			console.log("Login: ", err)
 		})
 	}
